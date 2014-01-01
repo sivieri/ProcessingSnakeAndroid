@@ -6,9 +6,8 @@ import java.util.HashSet;
 import java.util.Random;
 import java.util.Set;
 
-import ketai.ui.KetaiGesture;
 import processing.core.PApplet;
-import android.view.MotionEvent;
+import processing.event.MouseEvent;
 
 public class Snake extends PApplet {
 	private static final int ROWS = 10;
@@ -17,7 +16,6 @@ public class Snake extends PApplet {
 	// private static final int SIZE = 400;
 	private static final int SPEED = 500;
 
-	private KetaiGesture gesture;
 	private int topCorner;
 	private int leftCorner;
 	private Pair food;
@@ -27,11 +25,12 @@ public class Snake extends PApplet {
 	private Direction direction;
 	private long last;
 	private boolean collision = false;
+	private int startTouchX;
+	private int startTouchY;
 
 	@Override
 	public void setup() {
 		// size(SIZE, SIZE);
-		this.gesture = new KetaiGesture(this);
 		this.topCorner = this.height / 2 - ROWS / 2 * SIDE;
 		this.leftCorner = this.width / 2 - COLS / 2 * SIDE;
 		this.direction = Direction.getRandomDirection();
@@ -104,31 +103,30 @@ public class Snake extends PApplet {
 		}
 	}
 
-	public void onFlick(float x, float y, float px, float py, float v) {
-		float xdiff = px - x;
-		float ydiff = py - y;
-		if (Math.abs(xdiff) > Math.abs(ydiff) && xdiff < 0) {
-			this.direction = Direction.RIGHT;
-		}
-		else if (Math.abs(xdiff) > Math.abs(ydiff) && xdiff > 0) {
-			this.direction = Direction.LEFT;
-		}
-		else if (Math.abs(xdiff) < Math.abs(ydiff) && ydiff < 0) {
-			this.direction = Direction.DOWN;
-		}
-		else if (Math.abs(xdiff) < Math.abs(ydiff) && ydiff > 0) {
-			this.direction = Direction.UP;
-		}
+	@Override
+	public void mousePressed(MouseEvent arg0) {
+		this.startTouchX = arg0.getX();
+		this.startTouchY = arg0.getY();
 	}
 
 	@Override
-	public boolean surfaceTouchEvent(MotionEvent event) {
-
-		// call to keep mouseX, mouseY, etc updated
-		super.surfaceTouchEvent(event);
-
-		// forward event to class for processing
-		return this.gesture.surfaceTouchEvent(event);
+	public void mouseReleased(MouseEvent arg0) {
+		int endTouchX = arg0.getX();
+		int endTouchY = arg0.getY();
+		int xdiff = endTouchX - this.startTouchX;
+		int ydiff = endTouchY - this.startTouchY;
+		if (Math.abs(xdiff) > Math.abs(ydiff) && xdiff > 0) {
+			this.direction = Direction.RIGHT;
+		}
+		else if (Math.abs(xdiff) > Math.abs(ydiff) && xdiff < 0) {
+			this.direction = Direction.LEFT;
+		}
+		else if (Math.abs(xdiff) < Math.abs(ydiff) && ydiff > 0) {
+			this.direction = Direction.DOWN;
+		}
+		else if (Math.abs(xdiff) < Math.abs(ydiff) && ydiff < 0) {
+			this.direction = Direction.UP;
+		}
 	}
 
 }
