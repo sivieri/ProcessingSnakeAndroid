@@ -13,7 +13,6 @@ public class Snake extends PApplet {
 	private static final int ROWS = 10;
 	private static final int COLS = 10;
 	private static final int SIDE = 40;
-	// private static final int SIZE = 400;
 	private static final int SPEED = 500;
 
 	private int topCorner;
@@ -30,7 +29,6 @@ public class Snake extends PApplet {
 
 	@Override
 	public void setup() {
-		// size(SIZE, SIZE);
 		this.topCorner = this.height / 2 - ROWS / 2 * SIDE;
 		this.leftCorner = this.width / 2 - COLS / 2 * SIDE;
 		this.direction = Direction.getRandomDirection();
