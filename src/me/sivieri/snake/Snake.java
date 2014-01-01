@@ -8,11 +8,13 @@ import java.util.Set;
 
 import processing.core.PApplet;
 import processing.event.MouseEvent;
+import android.os.Bundle;
+import android.os.Handler;
+import android.widget.Toast;
 
 public class Snake extends PApplet {
 	private static final int ROWS = 10;
 	private static final int COLS = 10;
-	private static final int SIDE = 40;
 	private static final int SPEED = 500;
 
 	private int topCorner;
@@ -26,11 +28,28 @@ public class Snake extends PApplet {
 	private boolean collision = false;
 	private int startTouchX;
 	private int startTouchY;
+	private int side;
+	private Handler handler;
+	private Runnable finalMessage = new Runnable() {
+
+		@Override
+		public void run() {
+			Toast.makeText(Snake.this, getString(R.string.final_msg) + " " + Snake.this.snake.size(), Toast.LENGTH_LONG).show();
+		}
+
+	};
+
+	@Override
+	public void onCreate(Bundle arg0) {
+		super.onCreate(arg0);
+		this.handler = new Handler();
+	}
 
 	@Override
 	public void setup() {
-		this.topCorner = this.height / 2 - ROWS / 2 * SIDE;
-		this.leftCorner = this.width / 2 - COLS / 2 * SIDE;
+		this.side = getResources().getInteger(R.integer.board_cell_size);
+		this.topCorner = this.height / 2 - ROWS / 2 * this.side;
+		this.leftCorner = this.width / 2 - COLS / 2 * this.side;
 		this.direction = Direction.getRandomDirection();
 		this.snake.addFirst(new Pair(this.random.nextInt(ROWS), this.random.nextInt(COLS)));
 		generateFood();
@@ -76,6 +95,7 @@ public class Snake extends PApplet {
 				for (Pair p : this.snake) {
 					if (!this.duplicatesDetection.add(p)) {
 						this.collision = true;
+						this.handler.post(this.finalMessage);
 						break;
 					}
 				}
@@ -96,7 +116,7 @@ public class Snake extends PApplet {
 				else {
 					fill(255);
 				}
-				rect(this.leftCorner + j * SIDE, this.topCorner + i * SIDE, SIDE, SIDE);
+				rect(this.leftCorner + j * this.side, this.topCorner + i * this.side, this.side, this.side);
 			}
 		}
 	}
