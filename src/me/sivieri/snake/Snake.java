@@ -2,9 +2,7 @@ package me.sivieri.snake;
 
 import java.util.ArrayDeque;
 import java.util.Deque;
-import java.util.HashSet;
 import java.util.Random;
-import java.util.Set;
 
 import processing.core.PApplet;
 import processing.event.MouseEvent;
@@ -21,7 +19,6 @@ public class Snake extends PApplet {
 	private int leftCorner;
 	private Pair food;
 	private Deque<Pair> snake = new ArrayDeque<Pair>();
-	private Set<Pair> duplicatesDetection = new HashSet<Pair>();
 	private Random random = new Random();
 	private Direction direction;
 	private long last;
@@ -50,7 +47,7 @@ public class Snake extends PApplet {
 		this.side = getResources().getInteger(R.integer.board_cell_size);
 		this.topCorner = this.height / 2 - ROWS / 2 * this.side;
 		this.leftCorner = this.width / 2 - COLS / 2 * this.side;
-		this.direction = Direction.getRandomDirection();
+		this.direction = Direction.values()[this.random.nextInt(Direction.values().length)];
 		this.snake.addFirst(new Pair(this.random.nextInt(ROWS), this.random.nextInt(COLS)));
 		generateFood();
 		this.last = System.currentTimeMillis();
@@ -72,18 +69,25 @@ public class Snake extends PApplet {
 				Pair oldHead = this.snake.getFirst();
 				switch (this.direction) {
 					case UP:
-						newHead = new Pair(oldHead.x - 1 < 0 ? ROWS - 1 : oldHead.x - 1, oldHead.y);
+						newHead = new Pair(oldHead.getX() - 1 < 0 ? ROWS - 1 : oldHead.getX() - 1, oldHead.getY());
 						break;
 					case DOWN:
-						newHead = new Pair(oldHead.x + 1 >= ROWS ? 0 : oldHead.x + 1, oldHead.y);
+						newHead = new Pair(oldHead.getX() + 1 >= ROWS ? 0 : oldHead.getX() + 1, oldHead.getY());
 						break;
 					case LEFT:
-						newHead = new Pair(oldHead.x, oldHead.y - 1 < 0 ? COLS - 1 : oldHead.y - 1);
+						newHead = new Pair(oldHead.getX(), oldHead.getY() - 1 < 0 ? COLS - 1 : oldHead.getY() - 1);
 						break;
 					case RIGHT:
-						newHead = new Pair(oldHead.x, oldHead.y + 1 >= COLS ? 0 : oldHead.y + 1);
+						newHead = new Pair(oldHead.getX(), oldHead.getY() + 1 >= COLS ? 0 : oldHead.getY() + 1);
 						break;
 				// no default
+				}
+				for (Pair p : this.snake) {
+					if (p.equals(newHead)) {
+						this.collision = true;
+						this.handler.post(this.finalMessage);
+						break;
+					}
 				}
 				this.snake.addFirst(newHead);
 				if (newHead.equals(this.food)) {
@@ -92,24 +96,24 @@ public class Snake extends PApplet {
 				else {
 					this.snake.removeLast();
 				}
-				for (Pair p : this.snake) {
-					if (!this.duplicatesDetection.add(p)) {
-						this.collision = true;
-						this.handler.post(this.finalMessage);
-						break;
-					}
-				}
-				this.duplicatesDetection.clear();
 				this.last = now;
 			}
 		}
 		// draw the board
-		if (this.collision) {
-			stroke(255, 0, 0);
-		}
 		for (int i = 0; i < ROWS; ++i) {
 			for (int j = 0; j < COLS; ++j) {
 				Pair p = new Pair(i, j);
+				if (p.equals(this.snake.getFirst())) {
+					stroke(255);
+				}
+				else {
+					if (this.collision) {
+						stroke(255, 0, 0);
+					}
+					else {
+						stroke(0);
+					}
+				}
 				if (this.snake.contains(p) || p.equals(this.food)) {
 					fill(0);
 				}

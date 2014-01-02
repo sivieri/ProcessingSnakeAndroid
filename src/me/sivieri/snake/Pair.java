@@ -1,12 +1,20 @@
 package me.sivieri.snake;
 
 public class Pair {
-	public int x;
-	public int y;
+	private int x;
+	private int y;
 
 	public Pair(int x, int y) {
 		this.x = x;
 		this.y = y;
+	}
+
+	public int getX() {
+		return this.x;
+	}
+
+	public int getY() {
+		return this.y;
 	}
 
 	@Override
