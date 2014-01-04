@@ -82,12 +82,9 @@ public class Snake extends PApplet {
 						break;
 				// no default
 				}
-				for (Pair p : this.snake) {
-					if (p.equals(newHead)) {
-						this.collision = true;
-						this.handler.post(this.finalMessage);
-						break;
-					}
+				if (this.snake.contains(newHead)) {
+					this.collision = true;
+					this.handler.post(this.finalMessage);
 				}
 				this.snake.addFirst(newHead);
 				if (newHead.equals(this.food)) {
@@ -100,20 +97,12 @@ public class Snake extends PApplet {
 			}
 		}
 		// draw the board
+		if (this.collision) {
+			stroke(255, 0, 0);
+		}
 		for (int i = 0; i < ROWS; ++i) {
 			for (int j = 0; j < COLS; ++j) {
 				Pair p = new Pair(i, j);
-				if (p.equals(this.snake.getFirst())) {
-					stroke(255);
-				}
-				else {
-					if (this.collision) {
-						stroke(255, 0, 0);
-					}
-					else {
-						stroke(0);
-					}
-				}
 				if (this.snake.contains(p) || p.equals(this.food)) {
 					fill(0);
 				}
